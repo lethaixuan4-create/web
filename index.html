@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stable Performance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Rajdhani:wght@500;700&family=Courier+Prime&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff9d;
+            --neon-red: #ff004c;
+            --bg-dark: #050505;
+            --glow: 0 0 15px var(--neon-blue), 0 0 30px rgba(0, 242, 255, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: #000;
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- HIỆU ỨNG TUYẾT --- */
+        #snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+
+        /* --- LOGIN SCREEN --- */
+        #login-screen {
+            position: fixed; z-index: 1000; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #0a1a1a 0%, #000 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .login-box {
+            width: 85%; max-width: 380px; background: rgba(0, 0, 0, 0.85);
+            padding: 40px 25px; border-radius: 35px;
+            border: 2px solid var(--neon-blue);
+            box-shadow: var(--glow);
+            text-align: center; backdrop-filter: blur(15px);
+            animation: border-flicker 2s infinite;
+        }
+
+        @keyframes border-flicker {
+            0%, 100% { border-color: var(--neon-blue); box-shadow: var(--glow); }
+            50% { border-color: var(--neon-red); box-shadow: 0 0 20px var(--neon-red); }
+        }
+
+        .avt-main {
+            width: 110px; height: 110px; border-radius: 50%;
+            border: 3px solid var(--neon-blue); box-shadow: var(--glow);
+            object-fit: cover; margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%; padding: 15px; background: #0d0d0d; border: 1px solid #222;
+            border-radius: 15px; color: white; outline: none; margin-bottom: 15px;
+            text-align: center; font-size: 16px;
+        }
+
+        .btn-auth {
+            width: 100%; padding: 16px; background: linear-gradient(90deg, #0072ff, #00c6ff);
+            border: none; border-radius: 15px; color: white; font-weight: 900;
+            cursor: pointer; text-transform: uppercase; font-family: 'Orbitron';
+        }
+
+        /* --- MAIN PANEL --- */
+        #main-app { display: none; position: relative; z-index: 100; width: 100%; max-width: 450px; padding: 20px; }
+
+        .glow-border {
+            border: 2px solid var(--neon-blue);
+            box-shadow: var(--glow);
+            border-radius: 35px;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 25px;
+        }
+
+        .panel-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 15px; }
+        .avt-small { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+
+        .panel-title h1 { font-family: 'Orbitron'; font-size: 32px; color: var(--neon-green); text-align: center; text-shadow: 0 0 10px var(--neon-green); }
+
+        /* Feature List (10 Items) */
+        .feature-grid { max-height: 350px; overflow-y: auto; margin: 20px 0; padding-right: 5px; }
+        .feature-item {
+            background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; 
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; border: 1px solid #1a1a1a;
+        }
+        .f-info h4 { color: var(--neon-green); font-size: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .f-info p { color: #555; font-size: 11px; }
+
+        /* Switch */
+        .switch { position: relative; width: 45px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+        input:checked + .slider:before { transform: translateX(21px); }
+
+        .big-btn { width: 100%; padding: 14px; border: none; border-radius: 20px; margin-bottom: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 11px; font-family: 'Orbitron'; }
+        .btn-cyan { background: linear-gradient(90deg, #00ffd5, #00f2ff); color: #000; }
+        .btn-pink { background: linear-gradient(90deg, #ff00c8, #ff004c); color: white; }
+
+        /* Terminal - Mặc định đen kịt */
+        .terminal { background: #000; border: 1px solid #111; border-radius: 20px; padding: 15px; height: 130px; font-family: 'Courier Prime'; font-size: 10px; overflow: hidden; margin-top: 15px; }
+        #terminal-content { display: none; } /* Chỉ hiện khi chạy */
+
+        /* CPU - Mặc định đường thẳng */
+        .cpu-box { background: #000; border: 1px solid #111; border-radius: 20px; height: 80px; position: relative; margin-top: 15px; overflow: hidden; }
+        #cpu-canvas { width: 100%; height: 100%; }
+        .cpu-val { position: absolute; top: 5px; right: 15px; color: var(--neon-blue); font-size: 10px; font-family: 'Orbitron'; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <canvas id="snow-canvas"></canvas>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <img src="https://files.catbox.moe/xg8fju.jpeg" class="avt-main">
+            <h1 class="login-title">Stable Performance</h1>
+            <div class="input-group">
+                <input type="text" id="user" placeholder="Tài khoản">
+                <input type="password" id="pass" placeholder="Mật khẩu">
+            </div>
+            <button class="btn-auth" onclick="handleLogin()">XÁC MINH DANH TÍNH</button>
+            <p style="margin-top: 20px; font-size: 11px; color: gold; letter-spacing: 2px;">copyright :@XTHAI X ADR</p>
+        </div>
+    </div>
+
+    <div id="main-app">
+        <div class="glow-border">
+            <div class="panel-header">
+                <img src="https://files.catbox.moe/c155bl.jpeg" class="avt-small">
+                <div>
+                    <div style="font-size: 16px; font-weight: bold; color: var(--neon-blue);">USER: <span id="user-display">AZEN</span></div>
+                    <div style="font-size: 10px; color: var(--neon-green);">LICENSE: LIFETIME</div>
+                </div>
+            </div>
+
+            <div class="panel-title">
+                <h1 id="dynamic-title">HỖ TRỢ KÉO TÂM </h1>
+                <p style="text-align:center; color: #444; font-size: 10px; margin-top: 5px;">AzenDzVcl</p>
+            </div>
+
+            <div class="feature-grid" id="feature-list"></div>
+
+            <button class="big-btn btn-cyan" onclick="activateSystem()">⚡ KÍCH HOẠT PREMIUM</button>
+            <button class="big-btn btn-pink" onclick="activateSystem()">⚙ Kích Hoạt All Chức Năng</button>
+
+            <div class="terminal">
+                <div id="terminal-content"></div>
+            </div>
+
+            <div class="cpu-box">
+                <canvas id="cpu-canvas"></canvas>
+                <div class="cpu-val" id="cpu-percent">IDLE</div>
+            </div>
+
+            <button onclick="location.reload()" style="background:none; border:none; color: #ff004c; width:100%; margin-top:15px; font-size: 11px; cursor:pointer; font-weight:bold;">[ ĐĂNG XUẤT ]</button>
+        </div>
+    </div>
+
+    <script>
+        // Danh sách tài khoản từ ảnh bạn gửi
+        const validUsers = ["azenyeuem11", "loginthanhcong5", "batdauss1", "ss178", "azenk7", "f168b"];
+        const validPass = "121@";
+
+        const features = [
+            { n: "AIMBOT LOCK", d: "Tự động ghim tâm đầu" },
+            { n: "ANTIBAN VIP", d: "Chống quét tài khoản 100%" },
+            { n: "ESP LINE", d: "Hiện vạch kẻ kẻ thù" },
+            { n: "MAGIC BULLET", d: "Đạn ma thuật truy đuổi" },
+            { n: "NO RECOIL", d: "Súng không giật" },
+            { n: "SPEED X2", d: "Tăng tốc độ di chuyển" },
+            { n: "WALLHACK", d: "Nhìn xuyên vật cản" },
+            { n: "HIGH JUMP", d: "Nhảy cao đột biến" },
+            { n: "FAST RELOAD", d: "Thay đạn cực nhanh" },
+            { n: "ANTENNA HEAD", d: "Hiện vị trí bằng anten" }
+        ];
+
+        let isRunning = false;
+
+        // Khởi tạo tính năng
+        const list = document.getElementById('feature-list');
+        features.forEach(f => {
+            list.innerHTML += `
+                <div class="feature-item">
+                    <div class="f-info"><h4>${f.n}</h4><p>● ${f.d}</p></div>
+                    <label class="switch">
+                        <input type="checkbox" onchange="checkTrigger()">
+                        <span class="slider"></span>
+                    </label>
+                </div>`;
+        });
+
+        function handleLogin() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            if (validUsers.includes(u) && p === validPass) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('user-display').innerText = u.toUpperCase();
+                drawStaticLine();
+            } else { alert("Sai tài khoản hoặc mật khẩu!"); }
+        }
+
+        function checkTrigger() { if(!isRunning) activateSystem(); }
+
+        function activateSystem() {
+            if(isRunning) return;
+            isRunning = true;
+            document.getElementById('terminal-content').style.display = 'block';
+            startTerminal();
+            startCpuWave();
+        }
+
+        function startTerminal() {
+            const logs = ["Search Process...", "Found FF Base", "Injecting libGance.so", "Memory Write OK", "Offset 0x771", "Bypass OK"];
+            const content = document.getElementById('terminal-content');
+            let i = 0;
+            setInterval(() => {
+                const line = document.createElement('div');
+                line.style.marginBottom = "4px";
+                line.innerHTML = `<span style="color:var(--neon-green)">[SYSTEM]</span> ${logs[i % logs.length]}... [0x${Math.floor(Math.random()*9999).toString(16)}]`;
+                content.appendChild(line);
+                if(content.childNodes.length > 7) content.removeChild(content.firstChild);
+            }, 700);
+        }
+
+        const canvas = document.getElementById('cpu-canvas');
+        const ctx = canvas.getContext('2d');
+        function drawStaticLine() {
+            canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+            ctx.beginPath(); ctx.strokeStyle = "#111"; ctx.lineWidth = 2;
+            ctx.moveTo(0, canvas.height/2); ctx.lineTo(canvas.width, canvas.height/2);
+            ctx.stroke();
+        }
+
+        function startCpuWave() {
+            let offset = 0;
+            function animate() {
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+                ctx.beginPath(); ctx.strokeStyle = "var(--neon-blue)"; ctx.lineWidth = 2;
+                ctx.shadowBlur = 10; ctx.shadowColor = "var(--neon-blue)";
+                for(let x=0; x<canvas.width; x++) {
+                    let y = canvas.height/2 + Math.sin(x * 0.1 + offset) * (20 * Math.random());
+                    if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                }
+                ctx.stroke();
+                offset += 0.2;
+                document.getElementById('cpu-percent').innerText = Math.floor(Math.random()*40+40) + "%";
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // --- TUYẾT RƠI ---
+        const sc = document.getElementById('snow-canvas');
+        const sctx = sc.getContext('2d');
+        let flakes = [];
+        function initSnow() {
+            sc.width = window.innerWidth; sc.height = window.innerHeight;
+            flakes = [];
+            for(let i=0; i<100; i++) flakes.push({x:Math.random()*sc.width, y:Math.random()*sc.height, s:Math.random()*3+1, v:Math.random()*1+0.5});
+        }
+        function drawSnow() {
+            sctx.clearRect(0,0,sc.width,sc.height); sctx.fillStyle = "white";
+            flakes.forEach(f => {
+                f.y += f.v; if(f.y > sc.height) f.y = -10;
+                sctx.beginPath(); sctx.arc(f.x, f.y, f.s, 0, Math.PI*2); sctx.fill();
+            });
+            requestAnimationFrame(drawSnow);
+        }
+        initSnow(); drawSnow();
+        window.onresize = initSnow;
+    </script>
+</body>
+</html>
