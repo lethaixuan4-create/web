@@ -1,0 +1,105 @@
+body {
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    background: url('https://files.catbox.moe/1depsa.png') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+}
+
+/* Hộp Đăng Nhập Trung Tâm */
+.center-box {
+    width: 350px;
+    padding: 30px;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(15px);
+    border-radius: 15px;
+    box-shadow: 0 0 30px #00ffee;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center;
+}
+
+input, select, button {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Orbitron';
+}
+
+input {
+    background: #111;
+    color: #00ffee;
+    border: 1px solid #00ffee;
+}
+
+button {
+    background: #00ffee;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #00c8cc;
+}
+
+.hidden { display: none; }
+
+.menu { padding: 20px; }
+
+.section {
+    background: rgba(0,0,0,0.8);
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #00ffee;
+}
+
+/* Nút Gạt (Switch) */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.sliderSwitch {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #444;
+    transition: .4s;
+    border-radius: 25px;
+}
+
+.sliderSwitch:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 3.5px;
+    background: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .sliderSwitch {
+    background: #00ffee;
+    box-shadow: 0 0 15px #00ffee;
+}
+
+input:checked + .sliderSwitch:before {
+    transform: translateX(24px);
+}
+
+.slider { width: 100%; }
